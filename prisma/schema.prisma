@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  password   String
+  email      String   @unique
+  image      String?
+  profile    Profile? //one-to-one relationship
+  posts      Post[] //one-to-many relationship
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("users")
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  admin      Boolean  @default(true)
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int      @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("profiles")
+}
+
+model Category {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?
+  posts       CategoryPost[] //many-to-many relationship
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @default(now())
+
+  @@map("categories")
+}
+
+model Post {
+  id         Int            @id @default(autoincrement())
+  title      String
+  content    String         @db.Text()
+  categories CategoryPost[] //many-to-many relationship
+  user       User           @relation(fields: [user_id], references: [id])
+  user_id    Int
+  status     Boolean
+  image      String?
+  created_at DateTime       @default(now())
+  updated_at DateTime       @default(now())
+
+  @@map("posts")
+}
+
+model CategoryPost {
+  id Int @id @default(autoincrement())
+
+  post    Post @relation(fields: [post_id], references: [id])
+  post_id Int
+
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("categories_posts")
+}
