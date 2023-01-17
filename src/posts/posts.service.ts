@@ -6,12 +6,27 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Injectable()
 export class PostsService {
 
-  constructor(private prisma: PrismaService){}
+  constructor(private prisma: PrismaService) { }
 
- async create(data: CreatePostDto) {
+  async create(data: CreatePostDto) {
 
-    return data;
-  
+    const post = await this.prisma.post.create({
+      data: {
+        title: data.titulo,
+        content: data.content,
+        status: data.status ? true : false,
+        image: data.image,
+        user_id: data.user_id,
+        categories: {
+          connect: [{
+            id: 2
+          }]
+        }
+      }
+    })
+
+    return post;
+
   }
 
   async findAll() {
