@@ -1,13 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body,Res, Param, Delete, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Res, UploadedFile, UseInterceptors } from '@nestjs/common/decorators';
+import {  UploadedFile, UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
-import fs from 'fs'
 
 
 @Controller('posts')
@@ -48,19 +47,28 @@ export class PostsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './upload/posts',
+      filename: (req, file, callback) => {
+        const fileExtName = extname(file.originalname);
+        callback(null, `${randomUUID()}${fileExtName}`);
+      }
+    })
 
-    //  fs.unlink(`./upload/posts/8d1817a0-4e4a-4efc-a03a-acacc3b465a8.jpeg`, (err) => {
-    //   if (err) throw err;
-    //   console.log('path/file.txt was deleted');
-    // })
+  }))
+   update(@Param('id') id: string, @Body() data: UpdatePostDto, @UploadedFile() file: Express.Multer.File) {
 
-    return this.postsService.update(Number(id), updatePostDto);
+    if(file?.filename){
+      data.image = file.filename
+    }
+
+    return this.postsService.update(Number(id), data);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+    return this.postsService.remove(Number(id));
   }
 
   @Get('/show-image/:image')

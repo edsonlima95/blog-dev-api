@@ -27,7 +27,7 @@ model User {
 model Profile {
   id         Int      @id @default(autoincrement())
   admin      Boolean  @default(true)
-  user       User     @relation(fields: [user_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    Int      @unique
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
@@ -51,7 +51,7 @@ model Post {
   title      String
   content    String         @db.Text()
   categories CategoryPost[] //many-to-many relationship
-  user       User           @relation(fields: [user_id], references: [id])
+  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    Int
   status     Boolean
   image      String?
@@ -64,7 +64,7 @@ model Post {
 model CategoryPost {
   id Int @id @default(autoincrement())
 
-  post    Post @relation(fields: [post_id], references: [id])
+  post    Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
   post_id Int
 
   category    Category @relation(fields: [category_id], references: [id])

@@ -2,11 +2,10 @@ import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
 import { PostsModule } from './posts/posts.module';
+import { MulterModule } from '@nestjs/platform-express'
 
 
 @Module({
@@ -14,10 +13,14 @@ import { PostsModule } from './posts/posts.module';
     AuthModule,
     UserModule,
     CategoryModule,
-    PostsModule,],
+    PostsModule,
+    MulterModule.register({
+      dest: './upload',
+    })
+  ], 
   controllers: [
-    AuthController, AppController,],
+    AuthController],
   providers: [
-    AuthService, AppService],
+    AuthService],
 })
 export class AppModule { }

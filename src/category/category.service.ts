@@ -35,6 +35,7 @@ export class CategoryService {
       }
     })
 
+
     if (!category) {
       throw new NotFoundException("Categoria não existe")
     }
@@ -60,12 +61,23 @@ export class CategoryService {
 
   async remove(id: number) {
 
+    console.log(id)
+
     const category = await this.prisma.category.findUnique({
-      where: { id }})
+      where: { id },
+      include: {
+        posts: true,
+      }
+    })
 
     if (!category) {
       throw new NotFoundException("Categoria não existe")
     }
+
+    if (category.posts.length > 0) {
+      throw new NotFoundException("Categoria contém posts relacionados")
+    }
+
 
     await this.prisma.category.delete({where: {id}})
 
