@@ -7,6 +7,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
+import { PostExistsInterceptor } from './interceptors/postExitsInterceptor';
 
 
 @Controller('posts')
@@ -71,9 +72,8 @@ export class PostsController {
     return this.postsService.remove(Number(id));
   }
 
-  
   @Post("/images/:id")
-  @UseInterceptors(FilesInterceptor('files', 20, {
+  @UseInterceptors(PostExistsInterceptor, FilesInterceptor('files', 20, {
     storage: diskStorage({
       destination: './upload/posts',
       filename: (req, file, callback) => {
@@ -84,7 +84,7 @@ export class PostsController {
 
   }))
   images(@Param('id') id: string, @UploadedFiles() files) {
-    
+
     const images = files.map(file => {
       return file.filename
     })

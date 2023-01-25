@@ -108,6 +108,9 @@ export class PostsService {
       await fs.promises.unlink(`./upload/posts/${post.image}`)
     }
 
+    /**
+     * Remove varias images relacionadas ao post.
+     */
     if (post.images.length > 0) {
       post.images.map(async (images) => (
         await fs.promises.unlink(`./upload/posts/${images.image}`)
@@ -121,16 +124,14 @@ export class PostsService {
     return { message: "Post deletado com sucesso" };
   }
 
+  /**
+   * Envia varias images para um post existente
+   */
   async images(id: number, images: string[]) {
 
     const post = await this.prisma.post.findUnique({
       where: { id }
     })
-
-    if (!post) {
-      throw new NotFoundException("Post não existe");
-
-    }
 
     images.map(async (image) => (
       await this.prisma.postImages.create({
