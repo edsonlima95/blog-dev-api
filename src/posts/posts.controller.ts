@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body,Res, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, Param, Delete, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import {  UploadedFile, UseInterceptors } from '@nestjs/common/decorators';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common/decorators';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
@@ -57,9 +57,9 @@ export class PostsController {
     })
 
   }))
-   update(@Param('id') id: string, @Body() data: UpdatePostDto, @UploadedFile() file: Express.Multer.File) {
+  update(@Param('id') id: string, @Body() data: UpdatePostDto, @UploadedFile() file: Express.Multer.File) {
 
-    if(file?.filename){
+    if (file?.filename) {
       data.image = file.filename
     }
 
@@ -69,6 +69,28 @@ export class PostsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postsService.remove(Number(id));
+  }
+
+  
+  @Post("/images/:id")
+  @UseInterceptors(FilesInterceptor('files', 20, {
+    storage: diskStorage({
+      destination: './upload/posts',
+      filename: (req, file, callback) => {
+        const fileExtName = extname(file.originalname);
+        callback(null, `${randomUUID()}${fileExtName}`);
+      }
+    })
+
+  }))
+  images(@Param('id') id: string, @UploadedFiles() files) {
+    
+    const images = files.map(file => {
+      return file.filename
+    })
+
+    return this.postsService.images(parseInt(id), images)
+
   }
 
   @Get('/show-image/:image')

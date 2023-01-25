@@ -39,7 +39,8 @@ export class PostsService {
 
     const posts = await this.prisma.post.findMany({
       include: {
-        categories: true
+        categories: true,
+        images: true
       }
     })
 
@@ -87,13 +88,16 @@ export class PostsService {
       where: { id }
     })
 
-    return {message: "Post atualizado com sucesso"};
+    return { message: "Post atualizado com sucesso" };
   }
 
   async remove(id: number) {
 
     const post = await this.prisma.post.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        images: true
+      }
     })
 
     if (!post) {
@@ -104,11 +108,40 @@ export class PostsService {
       await fs.promises.unlink(`./upload/posts/${post.image}`)
     }
 
+    if (post.images.length > 0) {
+      post.images.map(async (images) => (
+        await fs.promises.unlink(`./upload/posts/${images.image}`)
+      ))
+    }
+
     await this.prisma.post.delete({
       where: { id }
     })
 
     return { message: "Post deletado com sucesso" };
+  }
+
+  async images(id: number, images: string[]) {
+
+    const post = await this.prisma.post.findUnique({
+      where: { id }
+    })
+
+    if (!post) {
+      throw new NotFoundException("Post não existe");
+
+    }
+
+    images.map(async (image) => (
+      await this.prisma.postImages.create({
+        data: {
+          post_id: post.id,
+          image: image
+        }
+      })
+    ))
+
+    return images
   }
 
 }

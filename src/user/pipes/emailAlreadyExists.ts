@@ -7,6 +7,7 @@ export class EmailAlreadyExists implements PipeTransform {
 
     async transform(data: CreateUserDto) {
 
+
         const prisma = new PrismaClient();
 
         const { email } = data
@@ -21,6 +22,7 @@ export class EmailAlreadyExists implements PipeTransform {
             throw new InternalServerErrorException(["Email já existe, informe um email diferente"]);
         }
 
-        return true;
+        return data;
+
     }
 }

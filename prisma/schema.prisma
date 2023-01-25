@@ -55,6 +55,7 @@ model Post {
   user_id    Int
   status     Boolean
   image      String?
+  images     PostImages[]
   created_at DateTime       @default(now())
   updated_at DateTime       @default(now())
 
@@ -75,3 +76,13 @@ model CategoryPost {
 
   @@map("categories_posts")
 }
+
+model PostImages {
+  id      Int    @id @default(autoincrement())
+  post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id Int
+  image   String
+
+  @@map("post_images")
+}
+

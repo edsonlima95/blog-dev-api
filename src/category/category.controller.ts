@@ -20,12 +20,15 @@ export class CategoryController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  
+    return this.categoryService.findOne(parseInt(id));
+
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() data: UpdateCategoryDto) {
 
+    
     return this.categoryService.update(parseInt(id), data);
   }
 

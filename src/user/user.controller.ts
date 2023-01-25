@@ -1,18 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Put } from '@nestjs/common/decorators';
 import { EmailAlreadyExists } from './pipes/emailAlreadyExists';
 
-@Controller('users') 
+@Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
-  create(@Body(EmailAlreadyExists) createUserDto: CreateUserDto) {
-    // return this.userService.create(createUserDto);
-    return true
+  create(@Body(EmailAlreadyExists) data: CreateUserDto) {
+
+    return this.userService.create(data);
+
   }
 
   @Get()
@@ -22,16 +23,18 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(parseInt(id));
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    
+    return this.userService.update(parseInt(id), data);
+
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(parseInt(id));
   }
 }
